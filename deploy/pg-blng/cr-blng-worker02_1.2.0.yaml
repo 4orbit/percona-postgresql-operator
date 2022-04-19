@@ -1,0 +1,177 @@
+apiVersion: pg.percona.com/v1
+kind: PerconaPGCluster
+metadata:
+  labels:
+    pgo-version: 1.2.0
+  name: pg-blng-worker02
+spec:
+#  secretsName: pg-blng-worker02-users
+#  sslCA: pg-blng-worker02-ssl-ca
+#  sslSecretName: pg-blng-worker02-ssl-keypair
+#  sslReplicationSecretName: pg-blng-worker02-ssl-keypair
+  upgradeOptions:
+    versionServiceEndpoint: https://check.percona.com
+    apply: 14-recommended
+    schedule: "0 4 * * *"
+  database: pgdb
+  port: "5432"
+  user: pguser
+  disableAutofail: false
+  tlsOnly: false
+  standby: false
+  pause: false
+  keepData: true
+  keepBackups: true
+#  pgDataSource:
+#    restoreFrom: ""
+#    restoreOpts: ""
+#  tablespaceStorages:
+#    lake:
+#      volumeSpec:
+#        size: 1G
+#        accessmode: ReadWriteOnce
+#        storagetype: dynamic
+#        storageclass: ""
+#        matchLabels: ""
+#  walStorage:
+#    volumeSpec:
+#      size: 1G
+#      accessmode: ReadWriteOnce
+#      storagetype: dynamic
+#      storageclass: ""
+#      matchLabels: ""
+#  userLabels:
+#    pgo-version: "1.2.0"
+  pgPrimary:
+    image: percona/percona-postgresql-operator:1.2.0-ppg14-postgres-ha
+#    imagePullPolicy: Always
+    resources:
+      requests:
+#        cpu: 500m
+#        memory: "256Mi"
+#      limits:
+#        cpu: 500m
+#        memory: "256Mi"
+#    affinity:
+#      antiAffinityType: preferred
+    tolerations: []
+    volumeSpec:
+      size: 1G
+      accessmode: ReadWriteOnce
+      storagetype: dynamic
+      storageclass: ""
+#      matchLabels: ""
+    expose:
+      serviceType: ClusterIP
+#      loadBalancerSourceRanges:
+#      annotations:
+#        pg-cluster-annot: pg-blng-worker02
+#      labels:
+#        pg-cluster-label: pg-blng-worker02
+#    customconfig: ""
+  pmm:
+    enabled: false
+    image: percona/pmm-client:2.26.0
+#    imagePullPolicy: Always
+    serverHost: monitoring-service
+    serverUser: admin
+    pmmSecret: pg-blng-worker02-pmm-secret
+    resources:
+      requests:
+        memory: 200M
+        cpu: 500m
+#      limits:
+#        cpu: "1"
+#        memory: "400M"
+  backup:
+    image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbackrest
+#    imagePullPolicy: Always
+    backrestRepoImage: percona/percona-postgresql-operator:1.2.0-ppg14-pgbackrest-repo
+    resources:
+      requests:
+#        cpu: "200m"
+#        memory: "48Mi"
+#      limits:
+#        cpu: "1"
+#        memory: "64Mi"
+#    affinity:
+#      antiAffinityType: preferred
+    volumeSpec:
+      size: 1G
+      accessmode: ReadWriteOnce
+      storagetype: dynamic
+      storageclass: ""
+#      matchLabels: ""
+#    storages:
+#      my-gcs:
+#        type: gcs
+#        bucket: some-gcs-bucket
+#    repoPath: ""
+    schedule:
+      - name: "every-night-backup"
+        schedule: "0 0 * * *"
+        keep: 2
+        type: full
+        storage: local
+      - name: "once2h-backup"
+        schedule: "0 */2 * * *"
+        keep: 2
+        type: incr
+        storage: local
+  pgBouncer:
+    enabled: false
+    image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbouncer
+#    imagePullPolicy: Always
+    size: 0
+    resources:
+      requests:
+#        cpu: "1"
+#        memory: "128Mi"
+#      limits:
+#        cpu: "2"
+#        memory: "512Mi"
+#    affinity:
+#      antiAffinityType: preferred
+    expose:
+      serviceType: ClusterIP
+#      loadBalancerSourceRanges:
+#      annotations:
+#        pg-cluster-annot: pg-blng-worker02
+#      labels:
+#        pg-cluster-label: pg-blng-worker02
+  pgReplicas:
+    hotStandby:
+      size: 1
+      resources:
+        requests:
+#          cpu: "500m"
+#          memory: "256Mi"
+#        limits:
+#          cpu: "500m"
+#          memory: "256Mi"
+      volumeSpec:
+        accessmode: ReadWriteOnce
+        size: 1G
+        storagetype: dynamic
+        storageclass: ""
+#        matchLabels: ""
+#      labels:
+#        pg-cluster-label: pg-blng-worker02
+#      annotations:
+#        pg-cluster-annot: pg-blng-worker02-1
+      enableSyncStandby: false
+      expose:
+        serviceType: ClusterIP
+#        loadBalancerSourceRanges:
+#        annotations:
+#          pg-cluster-annot: pg-blng-worker02
+#        labels:
+#          pg-cluster-label: pg-blng-worker02
+  pgBadger:
+    enabled: false
+    image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbadger
+#    imagePullPolicy: Always
+    port: 10000
+#  securityContext:
+#    fsGroup: 1001
+#    supplementalGroups: [1001, 1002, 1003]
