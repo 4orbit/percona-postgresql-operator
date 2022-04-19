@@ -3,12 +3,12 @@ kind: PerconaPGCluster
 metadata:
   labels:
     pgo-version: 1.2.0
-  name: pg-nsi
+  name: pg-oib
 spec:
-#  secretsName: pg-nsi-users
-#  sslCA: pg-nsi-ssl-ca
-#  sslSecretName: pg-nsi-ssl-keypair
-#  sslReplicationSecretName: pg-nsi-ssl-keypair
+#  secretsName: pg-oib-users
+#  sslCA: pg-oib-ssl-ca
+#  sslSecretName: pg-oib-ssl-keypair
+#  sslReplicationSecretName: pg-oib-ssl-keypair
   upgradeOptions:
     versionServiceEndpoint: https://check.percona.com
     apply: 14-recommended
@@ -43,7 +43,8 @@ spec:
 #  userLabels:
 #    pgo-version: "1.2.0"
   pgPrimary:
-    image: percona/percona-postgresql-operator:1.2.0-ppg14-postgres-ha
+    image: harbor.ppdp.ru/kubernetes/postgres-ha:v01
+#    image: percona/percona-postgresql-operator:1.2.0-ppg14-postgres-ha
 #    imagePullPolicy: Always
     resources:
       requests:
@@ -65,9 +66,9 @@ spec:
       serviceType: ClusterIP
 #      loadBalancerSourceRanges:
 #      annotations:
-#        pg-cluster-annot: pg-nsi
+#        pg-cluster-annot: pg-oib
 #      labels:
-#        pg-cluster-label: pg-nsi
+#        pg-cluster-label: pg-oib
 #    customconfig: ""
   pmm:
     enabled: false
@@ -75,7 +76,7 @@ spec:
 #    imagePullPolicy: Always
     serverHost: monitoring-service
     serverUser: admin
-    pmmSecret: pg-nsi-pmm-secret
+    pmmSecret: pg-oib-pmm-secret
     resources:
       requests:
         memory: 200M
@@ -135,9 +136,9 @@ spec:
       serviceType: ClusterIP
 #      loadBalancerSourceRanges:
 #      annotations:
-#        pg-cluster-annot: pg-nsi
+#        pg-cluster-annot: pg-oib
 #      labels:
-#        pg-cluster-label: pg-nsi
+#        pg-cluster-label: pg-oib
   pgReplicas:
     hotStandby:
       size: 1
@@ -155,17 +156,17 @@ spec:
         storageclass: ""
 #        matchLabels: ""
 #      labels:
-#        pg-cluster-label: pg-nsi
+#        pg-cluster-label: pg-oib
 #      annotations:
-#        pg-cluster-annot: pg-nsi-1
+#        pg-cluster-annot: pg-oib-1
       enableSyncStandby: false
       expose:
         serviceType: ClusterIP
 #        loadBalancerSourceRanges:
 #        annotations:
-#          pg-cluster-annot: pg-nsi
+#          pg-cluster-annot: pg-oib
 #        labels:
-#          pg-cluster-label: pg-nsi
+#          pg-cluster-label: pg-oib
   pgBadger:
     enabled: false
     image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbadger
