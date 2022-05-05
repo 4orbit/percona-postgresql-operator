@@ -4,9 +4,9 @@ metadata:
   labels:
     pg-cluster: cluster1
     pgouser: admin
-  name: cluster1-backrest-full-backup
+  name: cluster1-backrest-incr-backup
 spec:
-  name: cluster1-backrest-full-backup
+  name: cluster1-backrest-incr-backup
   parameters:
     backrest-command: backup
 # backup type can be:
@@ -21,9 +21,9 @@ spec:
 # --repo1-retention-diff=4 how many differential backups to retain
 # --repo1-retention-archive=6 how many sets of WAL archives to retain alongside
 # the full and differential backups that are retained
-    backrest-opts: --type=full --repo1-retention-full=1
+    backrest-opts: --type=incr
     backrest-s3-verify-tls: "true"
     backrest-storage-type: ""
-    job-name: cluster1-backrest-full-backup
+    job-name: cluster1-backrest-incr-backup
     pg-cluster: cluster1
   tasktype: backrest

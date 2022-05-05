@@ -16,7 +16,8 @@ spec:
       storagetype: dynamic
   pgReplicas:
     hotStandby:
-      size: 0
+      #size: 0
+      size: 1
   pgBouncer:
     image: perconalab/percona-postgresql-operator:main-ppg14-pgbouncer
     size: 1

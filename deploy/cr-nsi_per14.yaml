@@ -3,16 +3,16 @@ kind: PerconaPGCluster
 metadata:
   labels:
     pgo-version: 1.2.0
-  name: pg-oib
+  name: nsi
 spec:
-#  secretsName: pg-oib-users
-#  sslCA: pg-oib-ssl-ca
-#  sslSecretName: pg-oib-ssl-keypair
-#  sslReplicationSecretName: pg-oib-ssl-keypair
-  upgradeOptions:
-    versionServiceEndpoint: https://check.percona.com
-    apply: 14-recommended
-    schedule: "0 4 * * *"
+#  secretsName: nsi-users
+#  sslCA: nsi-ssl-ca
+#  sslSecretName: nsi-ssl-keypair
+#  sslReplicationSecretName: nsi-ssl-keypair
+#  upgradeOptions:
+#    versionServiceEndpoint: https://check.percona.com
+#    apply: 14-recommended
+#    schedule: "0 4 * * *"
   database: pgdb
   port: "5432"
   user: pguser
@@ -43,13 +43,13 @@ spec:
 #  userLabels:
 #    pgo-version: "1.2.0"
   pgPrimary:
-    image: harbor.ppdp.ru/kubernetes/postgres-ha:v01
-#    image: percona/percona-postgresql-operator:1.2.0-ppg14-postgres-ha
+    image: percona/percona-postgresql-operator:1.2.0-ppg14-postgres-ha
+    #image: harbor.ppdp.ru/kubernetes/postgres-ha:v10
 #    imagePullPolicy: Always
     resources:
       requests:
-#        cpu: 500m
-#        memory: "256Mi"
+#       cpu: 500m
+#       memory: "256Mi"
 #      limits:
 #        cpu: 500m
 #        memory: "256Mi"
@@ -66,9 +66,9 @@ spec:
       serviceType: ClusterIP
 #      loadBalancerSourceRanges:
 #      annotations:
-#        pg-cluster-annot: pg-oib
+#        pg-cluster-annot: nsi
 #      labels:
-#        pg-cluster-label: pg-oib
+#        pg-cluster-label: nsi
 #    customconfig: ""
   pmm:
     enabled: false
@@ -76,11 +76,11 @@ spec:
 #    imagePullPolicy: Always
     serverHost: monitoring-service
     serverUser: admin
-    pmmSecret: pg-oib-pmm-secret
+    pmmSecret: nsi-pmm-secret
     resources:
       requests:
-        memory: 200M
-        cpu: 500m
+#       memory: 200M
+#       cpu: 500m
 #      limits:
 #        cpu: "1"
 #        memory: "400M"
@@ -88,8 +88,8 @@ spec:
     image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbackrest
 #    imagePullPolicy: Always
     backrestRepoImage: percona/percona-postgresql-operator:1.2.0-ppg14-pgbackrest-repo
-    resources:
-      requests:
+#    resources:
+#      requests:
 #        cpu: "200m"
 #        memory: "48Mi"
 #      limits:
@@ -109,15 +109,10 @@ spec:
 #        bucket: some-gcs-bucket
 #    repoPath: ""
     schedule:
-      - name: "every-night-backup"
-        schedule: "0 0 * * *"
-        keep: 2
+      - name: "sat-night-backup"
+        schedule: "0 0 * * 6"
+        keep: 3
         type: full
-        storage: local
-      - name: "once2h-backup"
-        schedule: "0 */2 * * *"
-        keep: 2
-        type: incr
         storage: local
   pgBouncer:
     image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbouncer
@@ -125,8 +120,8 @@ spec:
     size: 1
     resources:
       requests:
-#        cpu: "1"
-#        memory: "128Mi"
+#       cpu: "1"
+#       memory: "128Mi"
 #      limits:
 #        cpu: "2"
 #        memory: "512Mi"
@@ -136,9 +131,9 @@ spec:
       serviceType: ClusterIP
 #      loadBalancerSourceRanges:
 #      annotations:
-#        pg-cluster-annot: pg-oib
+#        pg-cluster-annot: nsi
 #      labels:
-#        pg-cluster-label: pg-oib
+#        pg-cluster-label: nsi
   pgReplicas:
     hotStandby:
       size: 1
@@ -148,7 +143,7 @@ spec:
 #          memory: "256Mi"
 #        limits:
 #          cpu: "500m"
-#          memory: "256Mi"
+#         memory: "256Mi"
       volumeSpec:
         accessmode: ReadWriteOnce
         size: 1G
@@ -156,17 +151,17 @@ spec:
         storageclass: ""
 #        matchLabels: ""
 #      labels:
-#        pg-cluster-label: pg-oib
+#        pg-cluster-label: nsi
 #      annotations:
-#        pg-cluster-annot: pg-oib-1
+#        pg-cluster-annot: nsi-1
       enableSyncStandby: false
       expose:
         serviceType: ClusterIP
 #        loadBalancerSourceRanges:
 #        annotations:
-#          pg-cluster-annot: pg-oib
+#          pg-cluster-annot: nsi
 #        labels:
-#          pg-cluster-label: pg-oib
+#          pg-cluster-label: nsi
   pgBadger:
     enabled: false
     image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbadger

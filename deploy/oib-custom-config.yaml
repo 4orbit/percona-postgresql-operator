@@ -1,0 +1,19 @@
+---
+bootstrap:
+  dcs:
+    postgresql:
+      parameters:
+        max_connections: 30
+postgresql:
+  dcs:
+    postgresql:
+      parameters:
+        max_connections: 30
+  pg_hba:
+    - local all postgres peer
+    - host replication primaryuser 0.0.0.0/0 md5
+    - host all primaryuser 0.0.0.0/0 reject
+    - host all postgres 0.0.0.0/0 md5
+    - host all testuser1 0.0.0.0/0 md5
+    - host all testuser2 0.0.0.0/0 md5
+    - host all all 0.0.0.0/0 md5
