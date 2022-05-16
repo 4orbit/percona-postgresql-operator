@@ -114,12 +114,12 @@ spec:
 #        keep: 3
 #        type: full
 #        storage: local
-      - name: "test-full-2h-backup"
+      - name: "test-full-backup"
         schedule: "10 */2 * * *"
         keep: 2
         type: full
         storage: local
-      - name: "test-incr-25min-backup"
+      - name: "test-incr-backup"
         schedule: "*/25 * * * *"
         keep: 2
         type: incr
