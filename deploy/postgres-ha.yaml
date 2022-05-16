@@ -1,0 +1,5 @@
+---
+dcs:
+  postgresql:
+    parameters:
+      max_connections: 50

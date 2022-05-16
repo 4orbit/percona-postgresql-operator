@@ -3,12 +3,12 @@ kind: PerconaPGCluster
 metadata:
   labels:
     pgo-version: 1.2.0
-  name: oib
+  name: vi
 spec:
-#  secretsName: oib-users
-#  sslCA: oib-ssl-ca
-#  sslSecretName: oib-ssl-keypair
-#  sslReplicationSecretName: oib-ssl-keypair
+#  secretsName: vi-users
+#  sslCA: vi-ssl-ca
+#  sslSecretName: vi-ssl-keypair
+#  sslReplicationSecretName: vi-ssl-keypair
 #  upgradeOptions:
 #    versionServiceEndpoint: https://check.percona.com
 #    apply: 14-recommended
@@ -44,7 +44,7 @@ spec:
 #    pgo-version: "1.2.0"
   pgPrimary:
     #image: percona/percona-postgresql-operator:1.2.0-ppg14-postgres-ha
-    image: harbor.ppdp.ru/kubernetes/postgres-ha:v10
+    image: harbor.ppdp.ru/kubernetes/postgres-ha:v13
 #    imagePullPolicy: Always
     resources:
       requests:
@@ -66,17 +66,17 @@ spec:
       serviceType: ClusterIP
 #      loadBalancerSourceRanges:
 #      annotations:
-#        pg-cluster-annot: oib
+#        pg-cluster-annot: vi
 #      labels:
-#        pg-cluster-label: oib
-    customconfig: "oib-custom-config"
+#        pg-cluster-label: vi
+    customconfig: "vi-custom-config"
   pmm:
     enabled: false
     image: percona/pmm-client:2.26.0
 #    imagePullPolicy: Always
     serverHost: monitoring-service
     serverUser: admin
-    pmmSecret: oib-pmm-secret
+    pmmSecret: vi-pmm-secret
     resources:
       requests:
 #       memory: 200M
@@ -116,12 +116,12 @@ spec:
 #        storage: local
       - name: "test-full-2h-backup"
         schedule: "10 */2 * * *"
-        keep: 3
+        keep: 2
         type: full
         storage: local
       - name: "test-incr-25min-backup"
         schedule: "*/25 * * * *"
-        keep: 3
+        keep: 2
         type: incr
         storage: local
   pgBouncer:
@@ -141,9 +141,9 @@ spec:
       serviceType: ClusterIP
 #      loadBalancerSourceRanges:
 #      annotations:
-#        pg-cluster-annot: oib
+#        pg-cluster-annot: vi
 #      labels:
-#        pg-cluster-label: oib
+#        pg-cluster-label: vi
   pgReplicas:
     hotStandby:
       size: 1
@@ -161,17 +161,17 @@ spec:
         storageclass: ""
 #        matchLabels: ""
 #      labels:
-#        pg-cluster-label: oib
+#        pg-cluster-label: vi
 #      annotations:
-#        pg-cluster-annot: oib-1
+#        pg-cluster-annot: vi-1
       enableSyncStandby: false
       expose:
         serviceType: ClusterIP
 #        loadBalancerSourceRanges:
 #        annotations:
-#          pg-cluster-annot: oib
+#          pg-cluster-annot: vi
 #        labels:
-#          pg-cluster-label: oib
+#          pg-cluster-label: vi
   pgBadger:
     enabled: false
     image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbadger
