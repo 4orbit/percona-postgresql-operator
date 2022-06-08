@@ -38,13 +38,9 @@
   "name": "PGBACKREST_PG1_PORT",
   "value": "{{.PgbackrestPGPort}}"
 },
-#{
-#  "name": "PGBACKREST_REPO1_TYPE",
-#  "value": "{{.PgbackrestRepo1Type}}"
-#},
 {
   "name": "PGBACKREST_REPO1_TYPE",
-  "value": "s3"
+  "value": "{{.PgbackrestRepo1Type}}"
 },
 {
   "name": "PGHA_PGBACKREST_LOCAL_S3_STORAGE",
