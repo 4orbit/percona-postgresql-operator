@@ -114,36 +114,37 @@ spec:
 #        keep: 3
 #        type: full
 #        storage: local
-      - name: "test-full-backup"
-        schedule: "10 */2 * * *"
+      - name: "full-backupi-weekly"
+        schedule: "0 2 * * 7"
         keep: 2
         type: full
         storage: local
-      - name: "test-incr-backup"
-        schedule: "*/25 * * * *"
+      - name: "incr-backup-daily"
+        schedule: "0 3 * * 1-6"
         keep: 2
         type: incr
         storage: local
-  pgBouncer:
-    image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbouncer
-#    imagePullPolicy: Always
-    size: 1
-    resources:
-      requests:
-#       cpu: "1"
-#       memory: "128Mi"
-#      limits:
-#        cpu: "2"
-#        memory: "512Mi"
-#    affinity:
-#      antiAffinityType: preferred
-    expose:
-      serviceType: ClusterIP
-#      loadBalancerSourceRanges:
-#      annotations:
-#        pg-cluster-annot: vi
-#      labels:
-#        pg-cluster-label: vi
+#  pgBouncer:
+#    enabled: false
+#    image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbouncer
+##    imagePullPolicy: Always
+#    size: 1
+#    resources:
+#      requests:
+##       cpu: "1"
+##       memory: "128Mi"
+##      limits:
+##        cpu: "2"
+##        memory: "512Mi"
+##    affinity:
+##      antiAffinityType: preferred
+#    expose:
+#      serviceType: ClusterIP
+##      loadBalancerSourceRanges:
+##      annotations:
+##        pg-cluster-annot: vi
+##      labels:
+##        pg-cluster-label: vi
   pgReplicas:
     hotStandby:
       size: 1
