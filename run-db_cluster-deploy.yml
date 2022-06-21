@@ -1,0 +1,101 @@
+---
+# file: run-db_cluster-deploy.yaml   (playbook)
+
+# usage: ansible-playbook run-db_cluster-deploy.yml  -e "target=db01,db02,db-name01"
+
+- name: "exec kubectl command for deploy sevreal pg clusters"
+  hosts: "{{ target }}"
+  gather_facts: false
+  vars:
+    date_time: " strftime "
+
+    pgo_max_connections                 : '98'
+    pgo_shared_buffers                  : '204MB'
+    pgo_effective_cache_size            : '820MB'
+    pgo_checkpoint_completion_target    : '0.9'
+    pgo_wal_buffers                     : '7864kB'
+    pgo_effective_io_concurrency        : '2'
+    pgo_work_mem                        : '655kB'
+    pgo_min_wal_size                    : '1GB'
+    pgo_max_wal_size                    : '4GB'
+    pgo_shared_preload_libraries        : 'pg_cron,pg_stat_monitor,pgaudit,pg_stat_statements'
+
+    pgo_cpu_requests                    : '500m'
+    pgo_mem_requests                    : '1GB'
+
+  tasks:
+   - name: "set pgo_cluster_name"
+     set_fact:
+       pgo_cluster_name: "{{ ansible_host }}"
+
+   - debug: var=pgo_cluster_name verbosity=1
+
+   - name: "check present nameseace pgo"
+     local_action: >
+       shell kubectl get namespaces | grep -c 'pgo'
+     register: n_result
+     ignore_errors: true
+     run_once: true
+  
+   - debug: var=n_result.stdout_lines verbosity=1
+
+   - name: "create pg cluster namespeace if not exist"
+     local_action: >
+       shell kubectl create namespace pgo
+     register: k_result
+     run_once: true
+     when: n_result.stdout_lines[0] == "0"
+  
+   - debug: var=k_result.stdout_lines verbosity=1
+
+   - name: "deploy operator"
+     local_action: >
+       shell kubectl -n pgo apply -f git-work/percona-postgresql-operator/deploy/operator.yaml
+     register: k_result
+     run_once: true
+  
+   - debug: var=k_result.stdout_lines verbosity=1
+
+   - name: "check when operator is ready"
+     local_action: >
+       shell kubectl -n pgo get po | grep -c 'postgres-operator-.* 4/4'
+     register: k_result
+     retries: 40
+     delay: 20
+     until: k_result.stdout_lines[0] == "1"
+     run_once: true
+  
+   - debug: var=k_result.stdout_lines verbosity=1
+   
+   - debug: var=ansible_host verbosity=1
+
+   - name: "Make sure destination dir exists"
+     local_action: >
+       shell mkdir -p {{ playbook_dir }}/deploy/ans-{{ pgo_cluster_name }}-conf/
+     register: s_result
+
+   - debug: var=s_result.stdout_lines verbosity=1
+
+   - name: "create CR files for cluster"
+     template:
+       src: "{{ item }}"
+       dest: "{{ playbook_dir }}/deploy/ans-{{ pgo_cluster_name }}-conf/{{ item | basename | regex_replace('.j2','') }}"
+       mode: 0644
+     with_fileglob:
+       - "{{ playbook_dir }}/ans-templates/*.j2"
+     delegate_to: localhost
+
+     #   - name: "create custom configmap"
+     #     shell:
+     #       kubectl -n pgo create configmap {{ pgo_cluster_name }}-custom-config --from-file={{ playbook_dir }}/deploy//ans-{{ pgo_cluster_name }}-conf/postgres-ha.yaml
+     #     register: k_result
+     #     delegate_to: localhost
+     #  
+     #   - debug: var=k_result.stdout_lines verbosity=1
+
+   - name: "apply deploy files for cluster CR"
+     local_action: >
+       shell kubectl -n pgo apply -f {{ playbook_dir }}/deploy//ans-{{ pgo_cluster_name }}-conf/cr-alt8_pg12.yaml
+     register: k_result
+  
+   - debug: var=k_result.stdout_lines verbosity=1

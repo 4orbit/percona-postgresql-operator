@@ -7,5 +7,4 @@ tools
 /e2e-tests/conf/gcs-credentials.json
 licenses/*
 deploy/ans-*
-ans-*
 !licenses/LICENSE.txt

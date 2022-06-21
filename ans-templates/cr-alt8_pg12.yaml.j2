@@ -1,0 +1,183 @@
+apiVersion: pg.percona.com/v1
+kind: PerconaPGCluster
+metadata:
+  labels:
+    pgo-version: 1.2.0
+  name: {{ pgo_cluster_name }}
+spec:
+#  secretsName: {{ pgo_cluster_name }}-users
+#  sslCA: {{ pgo_cluster_name }}-ssl-ca
+#  sslSecretName: {{ pgo_cluster_name }}-ssl-keypair
+#  sslReplicationSecretName: {{ pgo_cluster_name }}-ssl-keypair
+#  upgradeOptions:
+#    versionServiceEndpoint: https://check.percona.com
+#    apply: 14-recommended
+#    schedule: "0 4 * * *"
+  database: pgdb
+  port: "5432"
+  user: pguser
+  disableAutofail: false
+  tlsOnly: false
+  standby: false
+  pause: false
+  keepData: true
+  keepBackups: true
+#  pgDataSource:
+#    restoreFrom: ""
+#    restoreOpts: ""
+#  tablespaceStorages:
+#    lake:
+#      volumeSpec:
+#        size: 1G
+#        accessmode: ReadWriteOnce
+#        storagetype: dynamic
+#        storageclass: ""
+#        matchLabels: ""
+#  walStorage:
+#    volumeSpec:
+#      size: 1G
+#      accessmode: ReadWriteOnce
+#      storagetype: dynamic
+#      storageclass: ""
+#      matchLabels: ""
+#  userLabels:
+#    pgo-version: "1.2.0"
+  pgPrimary:
+    #image: percona/percona-postgresql-operator:1.2.0-ppg14-postgres-ha
+    image: harbor.ppdp.ru/kubernetes/postgres-ha:v13
+#    imagePullPolicy: Always
+    resources:
+      requests:
+#        cpu: {{ pgo_cpu_requests }}
+#        memory: {{ pgo_mem_requests }}
+#      limits:
+#        cpu: 500m
+#        memory: "256Mi"
+#    affinity:
+#      antiAffinityType: preferred
+    tolerations: []
+    volumeSpec:
+      size: 1G
+      accessmode: ReadWriteOnce
+      storagetype: dynamic
+      storageclass: ""
+#      matchLabels: ""
+    expose:
+      serviceType: ClusterIP
+#      loadBalancerSourceRanges:
+#      annotations:
+#        pg-cluster-annot: {{ pgo_cluster_name }}
+#      labels:
+#        pg-cluster-label: {{ pgo_cluster_name }}
+    customconfig: "{{ pgo_cluster_name }}-custom-config"
+  pmm:
+    enabled: false
+    image: percona/pmm-client:2.26.0
+#    imagePullPolicy: Always
+    serverHost: monitoring-service
+    serverUser: admin
+    pmmSecret: {{ pgo_cluster_name }}-pmm-secret
+    resources:
+      requests:
+#       memory: 200M
+#       cpu: 500m
+#      limits:
+#        cpu: "1"
+#        memory: "400M"
+  backup:
+    image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbackrest
+#    imagePullPolicy: Always
+    backrestRepoImage: percona/percona-postgresql-operator:1.2.0-ppg14-pgbackrest-repo
+    resources:
+      requests:
+#        cpu: "200m"
+#        memory: "48Mi"
+#      limits:
+#        cpu: "1"
+#        memory: "64Mi"
+#    affinity:
+#      antiAffinityType: preferred
+    volumeSpec:
+      size: 1G
+      accessmode: ReadWriteOnce
+      storagetype: dynamic
+      storageclass: ""
+#      matchLabels: ""
+#    storages:
+#      my-gcs:
+#        type: gcs
+#        bucket: some-gcs-bucket
+#    repoPath: ""
+    schedule:
+#      - name: "sat-night-backup"
+#        schedule: "0 0 * * 6"
+#        keep: 3
+#        type: full
+#        storage: local
+      - name: "full-backupi-weekly"
+        schedule: "0 2 * * 7"
+        keep: 2
+        type: full
+        storage: local
+      - name: "incr-backup-daily"
+        schedule: "0 3 * * 1-6"
+        keep: 2
+        type: incr
+        storage: local
+#  pgBouncer:
+#    enabled: false
+#    image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbouncer
+##    imagePullPolicy: Always
+#    size: 1
+#    resources:
+#      requests:
+##       cpu: "1"
+##       memory: "128Mi"
+##      limits:
+##        cpu: "2"
+##        memory: "512Mi"
+##    affinity:
+##      antiAffinityType: preferred
+#    expose:
+#      serviceType: ClusterIP
+##      loadBalancerSourceRanges:
+##      annotations:
+##        pg-cluster-annot: {{ pgo_cluster_name }}
+##      labels:
+##        pg-cluster-label: {{ pgo_cluster_name }}
+  pgReplicas:
+    hotStandby:
+      size: 1
+      resources:
+        requests:
+#          cpu: {{ pgo_cpu_requests }}
+#          memory: {{ pgo_mem_requests }}
+#        limits:
+#          cpu: "500m"
+#         memory: "256Mi"
+      volumeSpec:
+        accessmode: ReadWriteOnce
+        size: 1G
+        storagetype: dynamic
+        storageclass: ""
+#        matchLabels: ""
+#      labels:
+#        pg-cluster-label: {{ pgo_cluster_name }}
+#      annotations:
+#        pg-cluster-annot: {{ pgo_cluster_name }}-1
+      enableSyncStandby: false
+      expose:
+        serviceType: ClusterIP
+#        loadBalancerSourceRanges:
+#        annotations:
+#          pg-cluster-annot: {{ pgo_cluster_name }}
+#        labels:
+#          pg-cluster-label: {{ pgo_cluster_name }}
+  pgBadger:
+    enabled: false
+    image: percona/percona-postgresql-operator:1.2.0-ppg14-pgbadger
+#    imagePullPolicy: Always
+    port: 10000
+#  securityContext:
+#    fsGroup: 1001
+#    supplementalGroups: [1001, 1002, 1003]

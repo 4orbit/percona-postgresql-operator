@@ -1,0 +1,25 @@
+---
+bootstrap:
+  dcs:
+    postgresql:
+      parameters:
+        max_connections: {{ pgo_max_connections }}
+        shared_buffers: {{ pgo_shared_buffers }}
+        effective_cache_size: {{ pgo_effective_cache_size }}
+        checkpoint_completion_target: {{ pgo_checkpoint_completion_target }}
+        wal_buffers: {{ pgo_wal_buffers }}
+        effective_io_concurrency: {{ pgo_effective_io_concurrency }}
+        work_mem: {{ pgo_work_mem }}
+        min_wal_size: {{ pgo_min_wal_size }}
+        max_wal_size: {{ pgo_max_wal_size }}
+        shared_preload_libraries: {{ pgo_shared_preload_libraries }}
+
+postgresql:
+  pg_hba:
+  - local all postgres peer
+  - host all all 127.0.0.1/32 trust
+  - host all all ::1/128 trust
+  - host replication primaryuser 0.0.0.0/0 md5
+  - host all primaryuser 0.0.0.0/0 reject
+  - host pgdb dev_user 0.0.0.0/0 md5
+  - host all all 0.0.0.0/0 md5
