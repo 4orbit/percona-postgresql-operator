@@ -22,6 +22,7 @@
 
     pgo_cpu_requests                    : '500m'
     pgo_mem_requests                    : '1GB'
+    pgo_krb_keyfile                     : '/var/tmp/krb5/postgres.keytab'
 
   tasks:
    - name: "set pgo_cluster_name"
@@ -85,13 +86,13 @@
        - "{{ playbook_dir }}/ans-templates/*.j2"
      delegate_to: localhost
 
-     #   - name: "create custom configmap"
-     #     shell:
-     #       kubectl -n pgo create configmap {{ pgo_cluster_name }}-custom-config --from-file={{ playbook_dir }}/deploy//ans-{{ pgo_cluster_name }}-conf/postgres-ha.yaml
-     #     register: k_result
-     #     delegate_to: localhost
-     #  
-     #   - debug: var=k_result.stdout_lines verbosity=1
+   - name: "create custom configmap"
+     shell:
+       kubectl -n pgo create configmap {{ pgo_cluster_name }}-custom-config --from-file={{ playbook_dir }}/deploy//ans-{{ pgo_cluster_name }}-conf/postgres-ha.yaml
+     register: k_result
+     delegate_to: localhost
+  
+   - debug: var=k_result.stdout_lines verbosity=1
 
    - name: "apply deploy files for cluster CR"
      local_action: >

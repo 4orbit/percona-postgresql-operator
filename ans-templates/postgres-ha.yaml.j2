@@ -13,6 +13,7 @@ bootstrap:
         min_wal_size: {{ pgo_min_wal_size }}
         max_wal_size: {{ pgo_max_wal_size }}
         shared_preload_libraries: {{ pgo_shared_preload_libraries }}
+        krb_server_keyfile: {{ pgo_krb_keyfile }}
 
 postgresql:
   pg_hba:
@@ -23,3 +24,9 @@ postgresql:
   - host all primaryuser 0.0.0.0/0 reject
   - host pgdb dev_user 0.0.0.0/0 md5
   - host all all 0.0.0.0/0 md5
+  pg_ident:
+  - users   service/{{ pgo_cluster_name }}-ds@PPDP.INT          {{ pgo_cluster_name }}_srv
+  - users   service/{{ pgo_cluster_name }}-front@PPDP.INT       {{ pgo_cluster_name }}_srv
+  - users   service/{{ pgo_cluster_name }}-reports-ds@PPDP.INT  {{ pgo_cluster_name }}_srv
+  - users   service/{{ pgo_cluster_name }}-ws@PPDP.INT          {{ pgo_cluster_name }}_srv
+
