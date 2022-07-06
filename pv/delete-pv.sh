@@ -13,9 +13,12 @@
 # limitations under the License.
 
 
+export PGO_CMD="kubectl"
+export PGO_OPERATOR_NAMESPACE="pgo"
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-for i in {1..100}
+for i in {01..29}
 do
    	echo "deleting PV crunchy-pv$i"
 	$PGO_CMD delete pv crunchy-pv$i

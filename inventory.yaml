@@ -5,11 +5,13 @@
       children:
         pgo_cluster:
           hosts:
-            vi:
-            nsi:
             pdb:
-            ff:
-
+            vi:
+            oib:
+            nsi:
+            billing:
+            cos:
+            offers:
 
         vars:
             # ==================

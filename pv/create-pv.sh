@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+export PGO_CMD="kubectl"
+export PGO_OPERATOR_NAMESPACE="pgo"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "create the test PV and PVC using the HostPath dir"
-for i in {1..100}
+for i in {01..29}
 do
    	echo "creating PV crunchy-pv$i"
 	export COUNTER=$i

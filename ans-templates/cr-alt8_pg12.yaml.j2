@@ -48,8 +48,8 @@ spec:
 #    imagePullPolicy: Always
     resources:
       requests:
-#        cpu: {{ pgo_cpu_requests }}
-#        memory: {{ pgo_mem_requests }}
+#        cpu: "{{ pgo_cpu_requests }}"
+#        memory: "{{ pgo_mem_requests }}"
 #      limits:
 #        cpu: 500m
 #        memory: "256Mi"
@@ -57,11 +57,14 @@ spec:
 #      antiAffinityType: preferred
     tolerations: []
     volumeSpec:
-      size: 1G
-      accessmode: ReadWriteOnce
-      storagetype: dynamic
-      storageclass: ""
-#      matchLabels: ""
+        hostPath:
+            path: /data/{{ pgo_cluster_name }}
+            type: Directory
+#      size: 1G
+#      accessmode: ReadWriteOnce
+#      storagetype: dynamic
+#      storageclass: ""
+##      matchLabels: ""
     expose:
       serviceType: ClusterIP
 #      loadBalancerSourceRanges:
@@ -92,18 +95,21 @@ spec:
     backrestRepoImage: percona/percona-postgresql-operator:1.2.0-ppg14-pgbackrest-repo
     resources:
       requests:
-#        cpu: "200m"
-#        memory: "48Mi"
+        cpu: "200m"
+        memory: "48Mi"
 #      limits:
 #        cpu: "1"
 #        memory: "64Mi"
 #    affinity:
 #      antiAffinityType: preferred
     volumeSpec:
-      size: 1G
-      accessmode: ReadWriteOnce
-      storagetype: dynamic
-      storageclass: ""
+        hostPath:
+            path: /data/{{ pgo_cluster_name }}
+            type: Directory
+#      size: 1G
+#      accessmode: ReadWriteOnce
+#      storagetype: dynamic
+#      storageclass: ""
 #      matchLabels: ""
 #    storages:
 #      my-gcs:
@@ -153,15 +159,18 @@ spec:
       resources:
         requests:
 #          cpu: {{ pgo_cpu_requests }}
-#          memory: {{ pgo_mem_requests }}
+#          memory: "{{ pgo_mem_requests }}"
 #        limits:
 #          cpu: "500m"
 #         memory: "256Mi"
       volumeSpec:
-        accessmode: ReadWriteOnce
-        size: 1G
-        storagetype: dynamic
-        storageclass: ""
+        hostPath:
+            path: /data/{{ pgo_cluster_name }}
+            type: Directory
+#        accessmode: ReadWriteOnce
+#        size: 1G
+#        storagetype: dynamic
+#        storageclass: ""
 #        matchLabels: ""
 #      labels:
 #        pg-cluster-label: {{ pgo_cluster_name }}

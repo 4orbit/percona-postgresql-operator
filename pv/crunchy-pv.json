@@ -6,11 +6,11 @@
   },
   "spec": {
     "capacity": {
-        "storage": "1Gi"
+        "storage": "40Gi"
     },
     "accessModes": [ "ReadWriteOnce", "ReadWriteMany", "ReadOnlyMany" ],
     "hostPath": {
-        "path": "/data"
+        "path": "/data/pv-$COUNTER"
     },
     "persistentVolumeReclaimPolicy": "Retain"
   }

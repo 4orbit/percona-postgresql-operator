@@ -21,8 +21,8 @@
     pgo_shared_preload_libraries        : 'pg_cron,pg_stat_monitor,pgaudit,pg_stat_statements'
 
     pgo_cpu_requests                    : '500m'
-    pgo_mem_requests                    : '1GB'
-    pgo_krb_keyfile                     : '/var/tmp/krb5/postgres.keytab'
+    pgo_mem_requests                    : '1024Mi'
+    pgo_krb_keyfile                     : '/tmp/postgres.keytab'
 
   tasks:
    - name: "set pgo_cluster_name"
@@ -51,7 +51,7 @@
 
    - name: "deploy operator"
      local_action: >
-       shell kubectl -n pgo apply -f git-work/percona-postgresql-operator/deploy/operator.yaml
+       shell kubectl -n pgo apply -f {{ playbook_dir }}/deploy/operator.yaml
      register: k_result
      run_once: true
   
@@ -86,17 +86,24 @@
        - "{{ playbook_dir }}/ans-templates/*.j2"
      delegate_to: localhost
 
-   - name: "create custom configmap"
-     shell:
-       kubectl -n pgo create configmap {{ pgo_cluster_name }}-custom-config --from-file={{ playbook_dir }}/deploy//ans-{{ pgo_cluster_name }}-conf/postgres-ha.yaml
-     register: k_result
-     delegate_to: localhost
-  
-   - debug: var=k_result.stdout_lines verbosity=1
-
-   - name: "apply deploy files for cluster CR"
+     #   - name: "create custom configmap"
+     #     shell:
+     #       kubectl -n pgo create configmap {{ pgo_cluster_name }}-custom-config --from-file={{ playbook_dir }}/deploy//ans-{{ pgo_cluster_name }}-conf/postgres-ha.yaml
+     #     register: k_result
+     #     delegate_to: localhost
+     #  
+     #   - debug: var=k_result.stdout_lines verbosity=1
+     #
+     #   - name: "apply deploy files for cluster CR"
+     #     local_action: >
+     #       shell kubectl -n pgo apply -f {{ playbook_dir }}/deploy//ans-{{ pgo_cluster_name }}-conf/cr-alt8_pg12.yaml
+     #     register: k_result
+     #  
+     #   - debug: var=k_result.stdout_lines verbosity=1
+     
+   - name: "apply deploy files for LoadBalancer"
      local_action: >
-       shell kubectl -n pgo apply -f {{ playbook_dir }}/deploy//ans-{{ pgo_cluster_name }}-conf/cr-alt8_pg12.yaml
+       shell kubectl -n pgo apply -f {{ playbook_dir }}/deploy//ans-{{ pgo_cluster_name }}-conf/lb-on.yaml
      register: k_result
   
    - debug: var=k_result.stdout_lines verbosity=1
