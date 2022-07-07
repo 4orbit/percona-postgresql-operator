@@ -1,0 +1,14 @@
+##################### Group vars ########################
+[all:vars]
+#group_vars/all
+
+
+###################### DBA #############################
+[pgo_cluster]
+pdb
+vi
+oib
+nsi
+billing
+cos
+offers
